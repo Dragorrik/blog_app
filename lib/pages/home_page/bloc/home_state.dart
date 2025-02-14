@@ -6,3 +6,5 @@ sealed class HomeState {}
 final class HomeInitial extends HomeState {}
 
 final class LogoutSuccessState extends HomeState {}
+
+final class AddButtonPressedState extends HomeState {}

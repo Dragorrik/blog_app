@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Home extends StatelessWidget {
-  const Home({super.key});
+  final String currentUserEmail;
+  const Home({super.key, required this.currentUserEmail});
 
   @override
   Widget build(BuildContext context) {
@@ -15,21 +16,66 @@ class Home extends StatelessWidget {
             if (state is LogoutSuccessState) {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => const LoginPage()));
+            } else if (state is AddButtonPressedState) {
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => AddBlogPage()));
             }
           },
           builder: (context, state) {
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Flutter Blog App'),
-                IconButton(
-                  icon: const Icon(
-                    Icons.logout,
-                    color: Colors.red,
-                  ),
-                  onPressed: () {
-                    context.read<HomeBloc>().add(LogoutButtonPressedEvent());
-                  },
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Flutter Blog App'),
+                    Text(
+                      'Welcome, $currentUserEmail',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    currentUserEmail == 'aarik@gmail.com'
+                        ? Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.add,
+                                color: Colors.greenAccent,
+                              ),
+                              onPressed: () {
+                                context
+                                    .read<HomeBloc>()
+                                    .add(LogoutButtonPressedEvent());
+                              },
+                            ),
+                          )
+                        : SizedBox(),
+                    SizedBox(width: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.logout,
+                          color: Colors.red,
+                        ),
+                        onPressed: () {
+                          context
+                              .read<HomeBloc>()
+                              .add(LogoutButtonPressedEvent());
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );

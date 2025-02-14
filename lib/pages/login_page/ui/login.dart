@@ -1,6 +1,7 @@
 import 'package:blog_app/pages/home_page/ui/home.dart';
 import 'package:blog_app/pages/login_page/bloc/login_bloc.dart';
 import 'package:blog_app/pages/register_page/ui/register.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,8 +26,15 @@ class _LoginPageState extends State<LoginPage> {
         child: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginSuccessState) {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Home()));
+              // Get currently logged-in user
+              final currentUser = FirebaseAuth.instance.currentUser;
+              final currentUserEmail = currentUser?.email;
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Home(
+                          currentUserEmail:
+                              currentUserEmail ?? 'Unknown User')));
             } else if (state is LoginErrorState) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(state.errorMessage),
@@ -184,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             );
           },
