@@ -2,6 +2,7 @@ import 'package:blog_app/pages/home_page/bloc/home_bloc.dart';
 import 'package:blog_app/pages/home_page/ui/home.dart';
 import 'package:blog_app/pages/login_page/bloc/login_bloc.dart';
 import 'package:blog_app/pages/login_page/ui/login.dart';
+import 'package:blog_app/pages/register_page/bloc/register_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -17,6 +18,9 @@ void main() async {
       providers: [
         BlocProvider(
           create: (context) => LoginBloc(),
+        ),
+        BlocProvider(
+          create: (context) => RegisterBloc(),
         ),
         BlocProvider(
           create: (context) => HomeBloc(),

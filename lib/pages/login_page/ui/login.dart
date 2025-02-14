@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:blog_app/pages/home_page/ui/home.dart';
 import 'package:blog_app/pages/login_page/bloc/login_bloc.dart';
 import 'package:blog_app/pages/register_page/ui/register.dart';
@@ -22,7 +20,8 @@ class _LoginPageState extends State<LoginPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: Center(
+      body: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginSuccessState) {
@@ -37,7 +36,9 @@ class _LoginPageState extends State<LoginPage> {
           },
           builder: (context, state) {
             if (state is LoginLoadingState) {
-              return CircularProgressIndicator();
+              return Container(
+                  margin: EdgeInsets.only(top: screenHeight * 0.5),
+                  child: Center(child: CircularProgressIndicator()));
             }
             return Column(
               mainAxisAlignment: MainAxisAlignment.start,
