@@ -1,5 +1,5 @@
+import 'package:blog_app/pages/add_blog_page/bloc/add_blog_bloc.dart';
 import 'package:blog_app/pages/home_page/bloc/home_bloc.dart';
-import 'package:blog_app/pages/home_page/ui/home.dart';
 import 'package:blog_app/pages/login_page/bloc/login_bloc.dart';
 import 'package:blog_app/pages/login_page/ui/login.dart';
 import 'package:blog_app/pages/register_page/bloc/register_bloc.dart';
@@ -24,6 +24,9 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => HomeBloc(),
+        ),
+        BlocProvider(
+          create: (context) => AddBlogBloc(),
         ),
       ],
       child: const MyApp(),
