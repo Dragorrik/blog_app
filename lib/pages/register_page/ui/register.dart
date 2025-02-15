@@ -155,8 +155,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             return;
                           }
                           context.read<RegisterBloc>().add(
-                              RegisterButtonPressedEvent(emailController.text,
-                                  passwordController.text));
+                              RegisterButtonPressedEvent(
+                                  emailController.text,
+                                  passwordController.text,
+                                  nameController.text));
                           emailController.clear();
                           passwordController.clear();
                           confirmPasswordController.clear();

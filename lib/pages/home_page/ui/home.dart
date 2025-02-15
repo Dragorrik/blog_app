@@ -6,8 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Home extends StatefulWidget {
+  final String currentUserName;
   final String currentUserEmail;
-  const Home({super.key, required this.currentUserEmail});
+  const Home(
+      {super.key,
+      required this.currentUserName,
+      required this.currentUserEmail});
 
   @override
   State<Home> createState() => _HomeState();
@@ -48,7 +52,7 @@ class _HomeState extends State<Home> {
                   children: [
                     const Text('Flutter Blog App'),
                     Text(
-                      'Welcome, ${widget.currentUserEmail}',
+                      'Welcome, ${widget.currentUserName}',
                       style: TextStyle(fontSize: 12),
                     ),
                   ],

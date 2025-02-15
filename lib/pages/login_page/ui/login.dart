@@ -1,6 +1,8 @@
+import 'package:blog_app/auth_services/user_info.dart';
 import 'package:blog_app/pages/home_page/ui/home.dart';
 import 'package:blog_app/pages/login_page/bloc/login_bloc.dart';
 import 'package:blog_app/pages/register_page/ui/register.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,17 +34,34 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: BlocConsumer<LoginBloc, LoginState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is LoginSuccessState) {
-              // Get currently logged-in user
               final currentUser = FirebaseAuth.instance.currentUser;
-              final currentUserEmail = currentUser?.email;
-              Navigator.pushReplacement(
+
+              if (currentUser != null) {
+                // Fetch user details from Firestore using UID
+                DocumentSnapshot? userDoc =
+                    await CurrentUserInfo.getUserInfo(currentUser);
+
+                // Extract username (default to 'Unknown User' if not found)
+                String currentUserName = (userDoc != null && userDoc.exists)
+                    ? userDoc.get('username') ?? 'Unknown User'
+                    : 'Unknown User';
+                String currentUserEmail = (userDoc != null && userDoc.exists)
+                    ? userDoc.get('email') ?? 'Unknown User'
+                    : 'Unknown User';
+
+                // Navigate to Home page with username
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => Home(
-                          currentUserEmail:
-                              currentUserEmail ?? 'Unknown User')));
+                    builder: (context) => Home(
+                      currentUserName: currentUserName,
+                      currentUserEmail: currentUserEmail,
+                    ),
+                  ),
+                );
+              }
             } else if (state is LoginErrorState) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(state.errorMessage),
