@@ -18,13 +18,13 @@ class AddBlogBloc extends Bloc<AddBlogEvent, AddBlogState> {
       AddBlogButtonPressedEvent event, Emitter<AddBlogState> emit) async {
     emit(AddBlogLoadingState());
     try {
-      firestore.collection('blogs').add({
+      DocumentReference docRef = await firestore.collection('blogs').add({
         'title': event.title,
         'content': event.content,
         'created_at': FieldValue.serverTimestamp(),
       });
       await Future.delayed(Duration(seconds: 2));
-      emit(AddBlogSuccessState());
+      emit(AddBlogSuccessState(docRef.id));
     } catch (e) {
       emit(AddBlogErrorState(e.toString()));
     }
@@ -44,7 +44,7 @@ class AddBlogBloc extends Bloc<AddBlogEvent, AddBlogState> {
         'updated_at': FieldValue.serverTimestamp(),
       });
 
-      emit(AddBlogSuccessState());
+      emit(AddBlogSuccessState(event.blogId));
     } catch (e) {
       emit(AddBlogErrorState(e.toString()));
     }

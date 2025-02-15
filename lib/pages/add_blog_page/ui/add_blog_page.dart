@@ -1,4 +1,5 @@
 import 'package:blog_app/pages/add_blog_page/bloc/add_blog_bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -27,6 +28,14 @@ class _AddBlogPageState extends State<AddBlogPage> {
     }
   }
 
+  void createReactionCollection(String blogId) async {
+    final reactionsRef = FirebaseFirestore.instance
+        .collection('blogs')
+        .doc(blogId)
+        .collection('reactions');
+    await reactionsRef.doc('placeholder').set({'user': '', 'reaction': ''});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,6 +59,9 @@ class _AddBlogPageState extends State<AddBlogPage> {
             BlocConsumer<AddBlogBloc, AddBlogState>(
               listener: (context, state) {
                 if (state is AddBlogSuccessState) {
+                  if (widget.blogId == null) {
+                    createReactionCollection(state.blogId);
+                  }
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(widget.blogId == null
@@ -57,7 +69,7 @@ class _AddBlogPageState extends State<AddBlogPage> {
                           : 'Blog updated successfully!'),
                     ),
                   );
-                  Navigator.pop(context); // Close the page after success
+                  Navigator.pop(context);
                 } else if (state is AddBlogErrorState) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -82,7 +94,6 @@ class _AddBlogPageState extends State<AddBlogPage> {
                           }
 
                           if (widget.blogId == null) {
-                            // Add new blog
                             context.read<AddBlogBloc>().add(
                                   AddBlogButtonPressedEvent(
                                     titleController.text,
@@ -90,7 +101,6 @@ class _AddBlogPageState extends State<AddBlogPage> {
                                   ),
                                 );
                           } else {
-                            // Update existing blog
                             context.read<AddBlogBloc>().add(
                                   UpdateBlogButtonPressedEvent(
                                     widget.blogId!,

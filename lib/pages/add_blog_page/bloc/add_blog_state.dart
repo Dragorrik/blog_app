@@ -7,7 +7,11 @@ final class AddBlogInitial extends AddBlogState {}
 
 final class AddBlogLoadingState extends AddBlogState {}
 
-final class AddBlogSuccessState extends AddBlogState {}
+final class AddBlogSuccessState extends AddBlogState {
+  final String blogId;
+
+  AddBlogSuccessState(this.blogId);
+}
 
 final class AddBlogErrorState extends AddBlogState {
   final String error;

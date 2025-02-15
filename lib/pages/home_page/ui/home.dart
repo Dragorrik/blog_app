@@ -25,6 +25,15 @@ class _HomeState extends State<Home> {
         .snapshots();
   }
 
+  Future<void> addReaction(String blogId, String reaction) async {
+    await FirebaseFirestore.instance
+        .collection('blogs')
+        .doc(blogId)
+        .collection('reactions')
+        .doc(widget.currentUserEmail)
+        .set({'username': widget.currentUserName, 'reaction': reaction});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,8 +68,7 @@ class _HomeState extends State<Home> {
                 ),
                 Row(
                   children: [
-                    if (widget.currentUserEmail ==
-                        'aarik@gmail.com') // Admin only
+                    if (widget.currentUserEmail == 'aarik@gmail.com')
                       IconButton(
                         icon: const Icon(Icons.add, color: Colors.greenAccent),
                         onPressed: () {
@@ -91,13 +99,11 @@ class _HomeState extends State<Home> {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
-          print("Blogs count: ${snapshot.data?.docs.length ?? 0}");
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(child: Text('No blogs available.'));
           }
 
           var blogs = snapshot.data!.docs;
-
           return ListView.builder(
             itemCount: blogs.length,
             itemBuilder: (context, index) {
@@ -106,55 +112,81 @@ class _HomeState extends State<Home> {
               String title = blog['title'];
               String content = blog['content'];
 
-              print("Blog Data: ${blog.data()}");
               return Card(
                 margin: const EdgeInsets.all(8),
-                child: ListTile(
-                  title: Text(
-                    title,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    content,
-                    maxLines: 10,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: widget.currentUserEmail == 'aarik@gmail.com'
-                      ? SizedBox(
-                          width: 100,
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  // Edit blog
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AddBlogPage(
-                                        blogId: blogId,
-                                        existingTitle: title,
-                                        existingContent: content,
-                                      ),
-                                    ),
-                                  );
-                                },
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        title,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        content,
+                        maxLines: 10,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: widget.currentUserEmail == 'aarik@gmail.com'
+                          ? SizedBox(
+                              width: 100,
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AddBlogPage(
+                                            blogId: blogId,
+                                            existingTitle: title,
+                                            existingContent: content,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () async {
+                                      await FirebaseFirestore.instance
+                                          .collection('blogs')
+                                          .doc(blogId)
+                                          .delete();
+                                    },
+                                  ),
+                                ],
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () async {
-                                  // Delete blog
-
-                                  await FirebaseFirestore.instance
-                                      .collection('blogs')
-                                      .doc(blogId)
-                                      .delete();
-                                },
-                              ),
-                            ],
-                          ),
-                        )
-                      : SizedBox(),
+                            )
+                          : SizedBox(),
+                    ),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('blogs')
+                          .doc(blogId)
+                          .collection('reactions')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) return SizedBox();
+                        var reactions = snapshot.data!.docs;
+                        return Wrap(
+                          spacing: 10,
+                          children: reactions.map((reaction) {
+                            return Text('${reaction['reaction']} ');
+                          }).toList(),
+                        );
+                      },
+                    ),
+                    Wrap(
+                      spacing: 10,
+                      children: ['👍', '❤️', '😂', '😢'].map((emoji) {
+                        return IconButton(
+                          onPressed: () => addReaction(blogId, emoji),
+                          icon: Text(emoji, style: TextStyle(fontSize: 24)),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
               );
             },
