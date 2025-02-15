@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddBlogPage extends StatefulWidget {
-  const AddBlogPage({super.key});
+  final String? blogId;
+  final String? existingTitle;
+  final String? existingContent;
+
+  const AddBlogPage(
+      {super.key, this.blogId, this.existingTitle, this.existingContent});
 
   @override
   State<AddBlogPage> createState() => _AddBlogPageState();
@@ -14,9 +19,19 @@ class _AddBlogPageState extends State<AddBlogPage> {
   final TextEditingController contentController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.existingTitle != null) {
+      titleController.text = widget.existingTitle!;
+      contentController.text = widget.existingContent!;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Blog')),
+      appBar:
+          AppBar(title: Text(widget.blogId == null ? 'Add Blog' : 'Edit Blog')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -36,10 +51,13 @@ class _AddBlogPageState extends State<AddBlogPage> {
               listener: (context, state) {
                 if (state is AddBlogSuccessState) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Blog added successfully!')),
+                    SnackBar(
+                      content: Text(widget.blogId == null
+                          ? 'Blog added successfully!'
+                          : 'Blog updated successfully!'),
+                    ),
                   );
-                  titleController.clear();
-                  contentController.clear();
+                  Navigator.pop(context); // Close the page after success
                 } else if (state is AddBlogErrorState) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -53,14 +71,37 @@ class _AddBlogPageState extends State<AddBlogPage> {
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: () {
-                          context.read<AddBlogBloc>().add(
-                                AddBlogButtonPressedEvent(
-                                  titleController.text,
-                                  contentController.text,
-                                ),
-                              );
+                          if (titleController.text.isEmpty ||
+                              contentController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      "Title and content cannot be empty")),
+                            );
+                            return;
+                          }
+
+                          if (widget.blogId == null) {
+                            // Add new blog
+                            context.read<AddBlogBloc>().add(
+                                  AddBlogButtonPressedEvent(
+                                    titleController.text,
+                                    contentController.text,
+                                  ),
+                                );
+                          } else {
+                            // Update existing blog
+                            context.read<AddBlogBloc>().add(
+                                  UpdateBlogButtonPressedEvent(
+                                    widget.blogId!,
+                                    titleController.text,
+                                    contentController.text,
+                                  ),
+                                );
+                          }
                         },
-                        child: Text('Add Blog'),
+                        child: Text(
+                            widget.blogId == null ? 'Add Blog' : 'Update Blog'),
                       );
               },
             ),

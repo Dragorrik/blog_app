@@ -9,3 +9,11 @@ final class AddBlogButtonPressedEvent extends AddBlogEvent {
 
   AddBlogButtonPressedEvent(this.title, this.content);
 }
+
+class UpdateBlogButtonPressedEvent extends AddBlogEvent {
+  final String blogId;
+  final String title;
+  final String content;
+
+  UpdateBlogButtonPressedEvent(this.blogId, this.title, this.content);
+}

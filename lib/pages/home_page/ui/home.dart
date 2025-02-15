@@ -102,19 +102,59 @@ class _HomeState extends State<Home> {
             itemCount: blogs.length,
             itemBuilder: (context, index) {
               var blog = blogs[index];
+              String blogId = blog.id;
+              String title = blog['title'];
+              String content = blog['content'];
+
               print("Blog Data: ${blog.data()}");
               return Card(
                 margin: const EdgeInsets.all(8),
                 child: ListTile(
                   title: Text(
-                    blog['title'],
+                    title,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    blog['content'],
-                    maxLines: 2,
+                    content,
+                    maxLines: 10,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  trailing: widget.currentUserEmail == 'aarik@gmail.com'
+                      ? SizedBox(
+                          width: 100,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  // Edit blog
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddBlogPage(
+                                        blogId: blogId,
+                                        existingTitle: title,
+                                        existingContent: content,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () async {
+                                  // Delete blog
+
+                                  await FirebaseFirestore.instance
+                                      .collection('blogs')
+                                      .doc(blogId)
+                                      .delete();
+                                },
+                              ),
+                            ],
+                          ),
+                        )
+                      : SizedBox(),
                 ),
               );
             },
