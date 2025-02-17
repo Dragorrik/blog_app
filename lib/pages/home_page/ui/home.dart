@@ -113,6 +113,7 @@ class _HomeState extends State<Home> {
               String content = blog['content'];
 
               return Card(
+                color: Colors.white10,
                 margin: const EdgeInsets.all(8),
                 child: Column(
                   children: [
@@ -160,6 +161,7 @@ class _HomeState extends State<Home> {
                             )
                           : SizedBox(),
                     ),
+                    SizedBox(height: 10),
                     StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('blogs')
@@ -177,14 +179,27 @@ class _HomeState extends State<Home> {
                         );
                       },
                     ),
-                    Wrap(
-                      spacing: 10,
-                      children: ['👍', '❤️', '😂', '😢'].map((emoji) {
-                        return IconButton(
-                          onPressed: () => addReaction(blogId, emoji),
-                          icon: Text(emoji, style: TextStyle(fontSize: 24)),
-                        );
-                      }).toList(),
+                    SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(8),
+                          topRight: Radius.circular(8),
+                        ),
+                        border: Border(
+                          top: BorderSide(color: Colors.grey),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: ['👍', '❤️', '😂', '😢'].map((emoji) {
+                          return IconButton(
+                            onPressed: () => addReaction(blogId, emoji),
+                            icon: Text(emoji, style: TextStyle(fontSize: 24)),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ],
                 ),
