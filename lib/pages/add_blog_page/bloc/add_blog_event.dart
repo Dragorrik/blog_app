@@ -17,3 +17,9 @@ class UpdateBlogButtonPressedEvent extends AddBlogEvent {
 
   UpdateBlogButtonPressedEvent(this.blogId, this.title, this.content);
 }
+
+class DeleteBlogButtonPressedEvent extends AddBlogEvent {
+  final String blogId;
+
+  DeleteBlogButtonPressedEvent(this.blogId);
+}
